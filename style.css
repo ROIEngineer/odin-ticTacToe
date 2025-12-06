@@ -1,5 +1,13 @@
 /* style.css - Cartoon Network 2000s Style */
 
+/* highlight the three winning cells */
+.cell.highlight {
+  background: yellow;
+  /* slightly bigger text to emphasize the win */
+  font-weight: 700;
+  transform: scale(1.05);
+}
+
 :root {
   --cn-red: #ff3300;
   --cn-orange: #ff9900;
