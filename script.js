@@ -9,6 +9,16 @@ const cells = document.querySelectorAll(".cell");
 
 cells.forEach((cell, index) => {
   cell.addEventListener("click", () => {
-    console.log("You clicked cell:", index);
+    // Checks if selected cell is empty
+    if (board[index] !== "") return;
+
+    // Place X or O in the board array
+    board[index] = currentPlayer;
+
+    // Update the UI
+    cell.textContent = currentPlayer;
+
+    // Switch player
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
   });
 });
