@@ -1,0 +1,301 @@
+/* style.css - Cartoon Network 2000s Style */
+
+:root {
+  --cn-red: #ff3300;
+  --cn-orange: #ff9900;
+  --cn-yellow: #ffcc00;
+  --cn-green: #33cc66;
+  --cn-blue: #3399ff;
+  --cn-purple: #9966ff;
+  --cn-pink: #ff66cc;
+  --cn-black: #000000;
+  --cn-white: #ffffff;
+  --shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Import Cartoony Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&family=Fredoka+One&display=swap');
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Comic Neue", "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, 
+    var(--cn-pink) 0%, 
+    var(--cn-yellow) 25%, 
+    var(--cn-green) 50%, 
+    var(--cn-blue) 75%, 
+    var(--cn-purple) 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 10s ease infinite;
+  padding: 20px;
+}
+
+/* Animated Gradient Background */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Fun Background Elements */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 10% 20%, var(--cn-red) 2px, transparent 3px),
+    radial-gradient(circle at 90% 80%, var(--cn-blue) 2px, transparent 3px),
+    radial-gradient(circle at 30% 90%, var(--cn-green) 2px, transparent 3px),
+    radial-gradient(circle at 70% 10%, var(--cn-yellow) 2px, transparent 3px),
+    radial-gradient(circle at 50% 50%, var(--cn-purple) 2px, transparent 3px);
+  background-size: 200px 200px;
+  opacity: 0.4;
+  z-index: -1;
+  animation: floatShapes 30s linear infinite;
+}
+
+@keyframes floatShapes {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(100px, 50px) rotate(360deg); }
+}
+
+/* Main Container */
+main {
+  padding: 2.5rem;
+  border-radius: 25px;
+  background: var(--cn-white);
+  border: 6px solid var(--cn-black);
+  box-shadow: 
+    var(--shadow),
+    0 0 0 8px var(--cn-red),
+    0 0 0 12px var(--cn-blue),
+    0 0 0 16px var(--cn-yellow);
+  animation: wobble 4s ease-in-out infinite;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg); }
+  33% { transform: rotate(1deg); }
+  66% { transform: rotate(-1deg); }
+}
+
+/* Title Styling */
+.title {
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.title h1 {
+  font-family: 'Bangers', cursive;
+  font-size: 4rem;
+  color: var(--cn-red);
+  text-shadow: 
+    3px 3px 0 var(--cn-yellow),
+    6px 6px 0 rgba(0, 0, 0, 0.2);
+  letter-spacing: 3px;
+  margin-bottom: 1rem;
+  transform: rotate(-2deg);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(-2deg); }
+}
+
+.title::after {
+  content: "";
+  display: block;
+  width: 80%;
+  height: 10px;
+  background: linear-gradient(90deg, 
+    var(--cn-red), 
+    var(--cn-orange), 
+    var(--cn-yellow), 
+    var(--cn-green), 
+    var(--cn-blue), 
+    var(--cn-purple));
+  margin: 1rem auto;
+  border-radius: 5px;
+  border: 2px solid var(--cn-black);
+}
+
+/* Game Board */
+#game {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 12px;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, 
+    var(--cn-blue) 0%, 
+    var(--cn-purple) 100%);
+  border-radius: 15px;
+  border: 4px solid var(--cn-black);
+  box-shadow: 
+    inset 0 0 20px rgba(0, 0, 0, 0.3),
+    0 5px 15px rgba(0, 0, 0, 0.2);
+  min-height: 350px;
+}
+
+/* Game Cells */
+.cell {
+  border: 4px solid var(--cn-black);
+  border-radius: 12px;
+  background: var(--cn-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3.5rem;
+  font-weight: 900;
+  font-family: 'Fredoka One', cursive;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Individual Cell Colors */
+.cell:nth-child(1) { border-color: var(--cn-red); }
+.cell:nth-child(2) { border-color: var(--cn-orange); }
+.cell:nth-child(3) { border-color: var(--cn-yellow); }
+.cell:nth-child(4) { border-color: var(--cn-green); }
+.cell:nth-child(5) { border-color: var(--cn-blue); }
+.cell:nth-child(6) { border-color: var(--cn-purple); }
+.cell:nth-child(7) { border-color: var(--cn-pink); }
+.cell:nth-child(8) { border-color: var(--cn-red); }
+.cell:nth-child(9) { border-color: var(--cn-orange); }
+
+/* Cell Hover Effects */
+.cell:hover {
+  transform: translateY(-8px) scale(1.08);
+  background: linear-gradient(135deg, 
+    var(--cn-white) 0%, 
+    #f0f0f0 100%);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+}
+
+/* Shiny Effect on Hover */
+.cell::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent);
+  transition: left 0.5s;
+}
+
+.cell:hover::after {
+  left: 100%;
+}
+
+/* Player X Styling */
+.cell.x {
+  color: var(--cn-red);
+  text-shadow: 
+    2px 2px 0 var(--cn-yellow),
+    4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Player O Styling */
+.cell.o {
+  color: var(--cn-blue);
+  text-shadow: 
+    2px 2px 0 var(--cn-green),
+    4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Status Message */
+.status {
+  font-family: 'Comic Neue', cursive;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--cn-yellow);
+  border-radius: 15px;
+  border: 4px solid var(--cn-black);
+  color: var(--cn-red);
+  text-shadow: 1px 1px 0 var(--cn-white);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  main {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .title h1 {
+    font-size: 3rem;
+  }
+  
+  #game {
+    min-height: 300px;
+    gap: 8px;
+    padding: 1rem;
+  }
+  
+  .cell {
+    font-size: 2.8rem;
+  }
+  
+  .status {
+    font-size: 1.5rem;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .title h1 {
+    font-size: 2.5rem;
+  }
+  
+  #game {
+    min-height: 250px;
+  }
+  
+  .cell {
+    font-size: 2.2rem;
+  }
+}
