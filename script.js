@@ -15,11 +15,14 @@ const winningCombos = [
   [2,4,6]
 ];
 
-// Check win condition
-function checkWin(player) {
-  return winningCombos.some(combo => {
-    return combo.every(index => board[index] === player);
-  });
+// Return the winning combo array if player has won, otherwise null
+function getWinningCombo(player) {
+  for(const combo of winningCombos) {
+    if (combo.every(index => board[index] === player)) {
+      return combo;
+    }
+  }
+  return null;
 }
 
 // Reset Game
