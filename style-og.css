@@ -1,0 +1,61 @@
+:root {
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: center;
+  height: 100vh;
+  margin: 0;
+}
+
+main {
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.title {
+  margin: 2rem;
+  text-align: center;
+}
+
+#game {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 400px;
+  height: 350px;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.cell {
+  border: 2px solid black;
+  border-radius: 4px;
+  background: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5rem;
+  cursor: pointer;
+  user-select: none; /* prevents text highlight */
+}
+
+.cell:hover {
+  background: #ddd;
+}
