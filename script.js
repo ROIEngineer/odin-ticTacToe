@@ -1,3 +1,4 @@
+// Gameboard
 const Gameboard = (function () {
   const board = ["", "", "", "", "", "", "", "", ""]; // private
 
@@ -156,3 +157,97 @@ const GameController = (function (Gameboard) {
     getPlayers: () => ({ player1, player2 })
   };
 })(Gameboard);
+
+// DisplayController singleton: handles DOM rendering and events
+const DisplayController = (function (Gameboard, GameController) {
+  const cells = Array.from(document.querySelectorAll(".cell"));
+  const resetBtn = document.getElementById("resetBtn");
+  let messageEl = document.getElementById("message");
+
+  // If message element doesn't exist, create one (keeps HTML edits optional)
+  if (!messageEl) {
+    messageEl = document.createElement("div");
+    messageEl.id = "message";
+    messageEl.setAttribute("aria-live", "polite");
+    messageEl.style.marginTop = "8px";
+    // Try to place it below the board:
+    const gameEl = document.getElementById("game");
+    if (gameEl && gameEl.parentNode) gameEl.parentNode.insertBefore(messageEl, resetBtn ? resetBtn.nextSibling : gameEl.nextSibling);
+    else document.body.appendChild(messageEl);
+  }
+
+  function render() {
+    const board = Gameboard.getBoard();
+    // clear highlights on render (highlights should only be added by highlight())
+    cells.forEach((cell, i) => {
+      cell.classList.remove("highlight");
+      cell.textContent = board[i] || "";
+    });
+  }
+
+  function showMessage(text) {
+    messageEl.textContent = String(text || "");
+  }
+
+  function highlight(combo = []) {
+    combo.forEach(i => {
+      if (cells[i]) cells[i].classList.add("highlight");
+    });
+  }
+
+  function bindEvents() {
+    // Clear previous handlers (safe-guard in case you had old listeners)
+    cells.forEach((cell, i) => {
+      cell.onclick = () => {
+        const result = GameController.playTurn(i);
+        // If the playTurn call failed (e.g., cell taken or game inactive), show friendly message
+        if (!result || result.success === false) {
+          if (result && result.reason === "cell_taken_or_invalid") {
+            showMessage("That spot is already taken.");
+          } else if (result && result.reason === "game_inactive") {
+            showMessage("Round over — click Reset to play again.");
+          }
+          return;
+        }
+
+        // If GameController returned a structured result, prefer using it to show messages
+        if (result.result === "win" && result.winner) {
+          // We expect GameController to call DisplayController.highlight, but just in case:
+          if (result.combo) highlight(result.combo);
+          showMessage(`${result.winner.getName()} wins!`);
+          return;
+        }
+
+        if (result.result === "draw") {
+          showMessage("It's a draw!");
+          return;
+        }
+
+        // Otherwise continue: show whose turn it is
+        const current = GameController.getCurrentPlayer();
+        if (current && current.getName) showMessage(`${current.getName()}'s turn`);
+      };
+    });
+
+    // Reset button wiring (overwrites previous handlers safely)
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        GameController.reset();
+        showMessage(`${GameController.getCurrentPlayer().getName()}'s turn`);
+      };
+    }
+  }
+
+  // Initialize: render empty board and bind events
+  render();
+  bindEvents();
+
+  // Expose API that GameController expects
+  return {
+    render,
+    showMessage,
+    highlight,
+    bindEvents
+  };
+})(Gameboard, GameController);
+
