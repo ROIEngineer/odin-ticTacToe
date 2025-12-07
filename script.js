@@ -1,87 +1,158 @@
-// 1D board
-const board = ["", "", "", "", "", "", "", "", ""];
+const Gameboard = (function () {
+  const board = ["", "", "", "", "", "", "", "", ""]; // private
 
-// Track whose turn it is (X always starts)
-let currentPlayer = "X";
+  const winningCombos = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+  ];
 
-
-const winningCombos = [  
-  [0,1,2],
-  [3,4,5],
-  [6,7,8],
-  [0,3,6],
-  [1,4,7],
-  [2,5,8],
-  [0,4,8],
-  [2,4,6]
-];
-
-// Return the winning combo array if player has won, otherwise null
-function getWinningCombo(player) {
-  for (const combo of winningCombos) {
-    if (combo.every(index => board[index] === player)) {
-      return combo;
-    }
-  }
-  return null;
-}
-
-// Reset Game
-function resetGame() {
-  // Clear the board array
-  for (let i = 0; i < board.length; i++) {
-    board[i] = "";
+  function isValidIndex(i) {
+    return Number.isInteger(i) && i >= 0 && i < 9;
   }
 
-  // Clear the UI cells
-  cells.forEach(cell => {
-    cell.textContent = "";
-    cell.classList.remove("highlight");
-  });
+  function getWinningCombo(player) {
+    for (const combo of winningCombos) {
+      if (combo.every(index => board[index] === player)) {
+        return combo;
+      }
+    }
+    return null;
+  }
 
-  // Reset player turn
-  currentPlayer = "X";
-}
+  return {
+    // Read-only accessors
+    getBoard() {
+      return board;
+    },
+    getMark(index) {
+      if (!isValidIndex(index)) return null;
+      return board[index];
+    },
 
-// Grab all the cell elements from the page
-const cells = document.querySelectorAll(".cell");
+    // Mutators with validation
+    setMark(index, mark) {
+      if (!isValidIndex(index)) return false;
+      if (board[index] !== "") return false;
+      board[index] = mark;
+      return true;
+    },
 
-cells.forEach((cell, index) => {
-  cell.addEventListener("click", () => {
-    // Ignore clicks if game ended or cell already filled
-    if (!gameActive || board[index] !== "") return;
+    reset() {
+      for (let i = 0; i < board.length; i++) board[i] = "";
+    },
 
-    board[index] = currentPlayer;
-    cell.textContent = currentPlayer;
+    // Helpers
+    isFull() {
+      return !board.includes("");
+    },
 
-    // Check for a win: highlight the winning cells and stop the game (no auto-reset)
-    const winnerCombo = getWinningCombo(currentPlayer);
-    if (winnerCombo) {
-      winnerCombo.forEach(i => cells[i].classList.add("highlight"));
-      alert(currentPlayer + " wins!");
-      gameActive = false; // stop further moves until manual reset
-      return;
+    // Win detection (returns winning indices or null)
+    getWinningCombo: getWinningCombo
+  };
+})();
+
+// Player factory: creates simple player objects
+const createPlayer = (name, mark) => {
+  return {
+    getName: () => name,
+    setName: newName => name = newName,
+    getMark: () => mark
+  };
+};
+
+// GameController singleton: controls turns, plays moves, checks game end
+const GameController = (function (Gameboard) {
+  // players (created lazily so tests can inject different players)
+  let player1 = createPlayer("Player 1", "X");
+  let player2 = createPlayer("Player 2", "O");
+
+  let currentPlayer = player1;
+  let gameActive = true;
+
+  function start(p1, p2) {
+    if (p1) player1 = p1;
+    if (p2) player2 = p2;
+    currentPlayer = player1;
+    gameActive = true;
+    Gameboard.reset();
+    // If a DisplayController exists, ask it to re-render
+    if (typeof DisplayController !== "undefined" && DisplayController.render) {
+      DisplayController.render();
+      if (DisplayController.showMessage) DisplayController.showMessage(`${currentPlayer.getName()}'s turn`);
+    }
+  }
+
+  function switchPlayer() {
+    currentPlayer = currentPlayer === player1 ? player2 : player1;
+    if (typeof DisplayController !== "undefined" && DisplayController.showMessage) {
+      DisplayController.showMessage(`${currentPlayer.getName()}'s turn`);
+    }
+  }
+
+  // Attempt to play at index. Returns an object describing outcome.
+  function playTurn(index) {
+    if (!gameActive) return { success: false, reason: "game_inactive" };
+    const mark = currentPlayer.getMark();
+
+    // Ask Gameboard to set the mark; it returns true/false
+    const placed = Gameboard.setMark(index, mark);
+    if (!placed) return { success: false, reason: "cell_taken_or_invalid" };
+
+    // Let display update if present
+    if (typeof DisplayController !== "undefined" && DisplayController.render) {
+      DisplayController.render();
     }
 
-    // Check for draw: stop the game (no auto-reset)
-    if (!board.includes("")) {
-      alert("It's a draw!");
+    // Check for win
+    const winningCombo = Gameboard.getWinningCombo(mark);
+    if (winningCombo) {
       gameActive = false;
-      return;
+      if (typeof DisplayController !== "undefined" && DisplayController.highlight) {
+        DisplayController.highlight(winningCombo);
+      }
+      if (typeof DisplayController !== "undefined" && DisplayController.showMessage) {
+        DisplayController.showMessage(`${currentPlayer.getName()} wins!`);
+      }
+      return { success: true, result: "win", winner: currentPlayer, combo: winningCombo };
     }
 
-    // Switch player
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
-  });
-});
+    // Check for draw
+    if (Gameboard.isFull()) {
+      gameActive = false;
+      if (typeof DisplayController !== "undefined" && DisplayController.showMessage) {
+        DisplayController.showMessage("It's a draw!");
+      }
+      return { success: true, result: "draw" };
+    }
 
-let gameActive = true;  // true while a round is playable
-const resetBtn = document.getElementById("resetBtn");
+    // Continue game
+    switchPlayer();
+    return { success: true, result: "continue", currentPlayer };
+  }
 
-resetBtn.addEventListener("click", () => {
-  resetGame();
-  gameActive = true;
-});
+  function reset() {
+    Gameboard.reset();
+    currentPlayer = player1;
+    gameActive = true;
+    if (typeof DisplayController !== "undefined" && DisplayController.render) {
+      DisplayController.render();
+      if (DisplayController.showMessage) DisplayController.showMessage(`${currentPlayer.getName()}'s turn`);
+    }
+  }
 
-
-
+  // Public API
+  return {
+    start,
+    playTurn,
+    reset,
+    isActive: () => gameActive,
+    getCurrentPlayer: () => currentPlayer,
+    getPlayers: () => ({ player1, player2 })
+  };
+})(Gameboard);
