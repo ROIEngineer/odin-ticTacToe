@@ -8,6 +8,16 @@
   transform: scale(1.05);
 }
 
+#resetBtn {
+  margin-top: 16px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  background: white;
+}
+
 :root {
   --cn-red: #ff3300;
   --cn-orange: #ff9900;
