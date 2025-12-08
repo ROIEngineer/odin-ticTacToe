@@ -251,3 +251,56 @@ const DisplayController = (function (Gameboard, GameController) {
   };
 })(Gameboard, GameController);
 
+// Start screen wiring (assumes start HTML exists)
+(function () {
+  const startScreen = document.getElementById("startScreen");
+  const startBtn = document.getElementById("startBtn");
+  const input1 = document.getElementById("player1Name");
+  const input2 = document.getElementById("player2Name");
+  const resetBtn = document.getElementById("resetBtn");
+
+  function showStartScreen() {
+    if (startScreen) startScreen.style.display = "flex";
+    // Clear message and board visually
+    if (typeof DisplayController !== "undefined" && DisplayController.showMessage) {
+      DisplayController.showMessage("Enter names and start the game");
+    }
+    // Ensure board is blank visually (controller.reset would do this but keep UI consistent)
+    if (typeof DisplayController !== "undefined" && DisplayController.render) {
+      DisplayController.render();
+    }
+  }
+
+  function hideStartScreen() {
+    if (startScreen) startScreen.style.display = "none";
+  }
+
+  // Start button behavior: create players, start controller, hide overlay
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      const name1 = (input1 && input1.value.trim()) || "Player 1";
+      const name2 = (input2 && input2.value.trim()) || "Player 2";
+
+      const p1 = createPlayer(name1, "X");
+      const p2 = createPlayer(name2, "O");
+
+      GameController.start(p1, p2); // resets board and sets current player
+      if (typeof DisplayController !== "undefined" && DisplayController.showMessage) {
+        DisplayController.showMessage(`${GameController.getCurrentPlayer().getName()}'s turn`);
+      }
+      hideStartScreen();
+    });
+  }
+
+  // When Reset is clicked, show the start screen again (Option A behavior)
+  if (resetBtn) {
+    // addEventListener so we don't clobber existing handler in DisplayController
+    resetBtn.addEventListener("click", () => {
+      showStartScreen();
+    });
+  }
+
+  // Show start screen on first load
+  showStartScreen();
+})();
+
