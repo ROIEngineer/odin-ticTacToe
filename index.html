@@ -16,6 +16,25 @@
 	<h1>Tic Tac Toe</h1>
       </div>
 
+      <!-- START SCREEN: option A -->
+      <div id="startScreen" aria-modal="true" role="dialog">
+        <div id="startCard">
+          <h2>Tic-Tac-Toe</h2>
+
+          <label>
+            Player 1 name (X)
+            <input id="player1Name" type="text" placeholder="Player 1" />
+          </label>
+
+          <label>
+            Player 2 name (O)
+            <input id="player2Name" type="text" placeholder="Player 2" />
+          </label>
+
+          <button id="startBtn">Start Game</button>
+        </div>
+      </div>
+
       <!-- game board -->
       <div id="game">
         <!-- Tic Tac Toe grid -->
@@ -31,6 +50,8 @@
         <div class="cell"></div>
         <div class="cell"></div>
       </div>
+      <div id="resetBtn">Reset</div>
+      <div id="message" aria-live="polite" style="margin-top:8px;"></div>
     </main>
   </body>
 </html>
