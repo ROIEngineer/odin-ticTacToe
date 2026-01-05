@@ -18,7 +18,7 @@ A fully functional Tic-Tac-Toe game built using **modular JavaScript**, followin
 ---
 
 ## Live Demo 
-[Try the live demo](#https://odin-tic-tac-toe-ecru.vercel.app/)
+[Try the live demo](https://odin-tic-tac-toe-ecru.vercel.app/)
 ---
 
 ## 🧱 Project Structure (Modules)
